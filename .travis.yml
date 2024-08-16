@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - "1.22"
+  - "tip"
+
+matrix:
+  allow_failures:
+    - go: tip
+
+script:
+  - test -z $(gofmt -l .)
