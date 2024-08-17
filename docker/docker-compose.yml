@@ -79,15 +79,6 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
 
-  k6:
-    image: loadimpact/k6:latest
-    container_name: k6
-    volumes:
-      - ./scripts:/scripts
-      - ./api/protos:/api/protos  # Monta la directory corretta
-    entrypoint: ["k6", "run", "/scripts/grpc-test.js"]
-    depends_on:
-      - jaeger
 
 volumes:
   mongo_data:
