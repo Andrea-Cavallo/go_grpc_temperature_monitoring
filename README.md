@@ -1,50 +1,7 @@
 # Super cool Go con GRPC
 
-<img src="GRPC.png" alt="600">
+<img src="GRPC.png"  height="800" width="600">
 
-
-## Struttura packages
-```text
-/go_with_grpc
-│
-├── /api                      # Definizioni condivise delle API
-│   └── /protos
-│       └── temperature.proto
-│
-├── /pkg                      # Codice condiviso (pkg   temperature)
-│   └── /temperature
-│       ├── temperature.pb.go
-│       └── temperature_grpc.pb.go
-│
-├── /temperature_grpc_client  # grpc client per le implementazioni
-│   ├── /cmd
-│   │   └── /client
-│   │       └── main.go
-│   └── /service
-│       ├── client.go
-│       └── client.md
-│
-├── /temperature_grpc_server  # grpc server
-│   ├── /cmd
-│   │   └── /server
-│   │       └── main.go
-│   └── /service
-│       └── server.go
-│
-├── .idea
-├── .editorconfig
-├── .gitignore
-├── .travis.yml
-├── common.mk
-├── go.mod
-├── go_with_grpc.iml
-├── Makefile
-├── qodana.yml
-├── README.md
-└── requirements.txt
-
-
-```
 
 ## Esecuzione del Progetto
 

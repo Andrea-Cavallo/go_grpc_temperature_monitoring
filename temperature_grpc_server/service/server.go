@@ -4,7 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go_with_grpc/pkg/temperature"
+	"go_with_grpc/temperature_grpc_server/alert_twilio"
+	"go_with_grpc/temperature_grpc_server/mongodb/config"
+	"go_with_grpc/temperature_grpc_server/mongodb/temperature_repo"
 	"io"
 	"log"
 	"net/http"
@@ -13,25 +17,36 @@ import (
 	"time"
 )
 
+// Constants for WeatherAPI
+const (
+	envWeatherAPIKey = "WEATHER_API_KEY"
+	weatherAPIURL    = "http://api.weatherapi.com/v1/current.json?key=%s&q=%s"
+	mongoDBURI       = "mongodb://root:example@localhost:27017/temperatureDB?authSource=admin"
+	dbNAME           = "temperatureDB"
+	timeoutSeconds   = 10
+)
+
 // Server represents the gRPC server for the TemperatureService, containing a map of temperature readings and a mutex for synchronization.
 type Server struct {
 	temperature.UnimplementedTemperatureServiceServer
 	readings map[string][]*temperature.TemperatureReading
 	mu       sync.Mutex
+	client   *mongo.Client
 }
 
 // NewServer creates a new instance of the TemperatureService server.
 func NewServer() *Server {
+	config.InitializeConfig(mongoDBURI, dbNAME, timeoutSeconds)
+	client, err := config.GetMongoClient()
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+
 	return &Server{
 		readings: make(map[string][]*temperature.TemperatureReading),
+		client:   client,
 	}
 }
-
-// Constants for WeatherAPI
-const (
-	envWeatherAPIKey = "WEATHER_API_KEY"
-	weatherAPIURL    = "http://api.weatherapi.com/v1/current.json?key=%s&q=%s"
-)
 
 // GetCurrentTemperature retrieves the current temperature for a specified location.
 // It takes a context and a GetCurentTemperatureRequest as input parameters.
@@ -48,10 +63,19 @@ func (s *Server) GetCurrentTemperature(ctx context.Context, req *temperature.Get
 		return nil, err
 	}
 
+	alert_twilio.CheckAndSendAlert(temp)
+
 	reading := &temperature.TemperatureReading{
 		Location:    location,
 		Temperature: temp,
 		Timestamp:   time.Now().Unix(),
+	}
+	err = temperature_repo.InsertTemperature(s.client, temperature_repo.TemperatureReading{
+		Timestamp: time.Now(),
+		Value:     temp,
+	})
+	if err != nil {
+		log.Printf("Failed to insert temperature reading into MongoDB: %v", err)
 	}
 
 	log.Printf("Current temperature for %s: %.2f°C\n", location, temp)

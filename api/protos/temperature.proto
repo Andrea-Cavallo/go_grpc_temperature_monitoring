@@ -12,7 +12,6 @@ message TemperatureReading {
   int64 timestamp = 3;       // Timestamp Unix della lettura
 }
 
-
 // Richiesta per ottenere la temperatura attuale in questo caso prende in ingresso solo la citta
 message GetCurrentTemperatureRequest {
   string location = 1;
