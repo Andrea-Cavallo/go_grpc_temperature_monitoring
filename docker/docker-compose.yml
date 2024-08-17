@@ -25,7 +25,7 @@ services:
       - "16686:16686"
       - "14268:14268"
       - "14250:14250"
-      - "4317:4317"  # Porta OTLP gRPC per i tracciamenti
+      - "4317:4317"
       - "9411:9411"
 
   otel-collector:
@@ -34,9 +34,8 @@ services:
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "4319:4317"
+      - "4320:4317"
       - "55681:55681"
-
 
   prometheus:
     image: prom/prometheus:latest
@@ -52,7 +51,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=secret
+      - GF_SECURITY_ADMIN_PASSWORD=admin  # Imposta la password di default a "admin"
+      - GF_SECURITY_ADMIN_USER=admin       # Impost
 
   loki:
     image: grafana/loki:2.7.1
@@ -84,8 +84,10 @@ services:
     container_name: k6
     volumes:
       - ./scripts:/scripts
-      - ./api/protos:/api/protos
+      - ./api/protos:/api/protos  # Monta la directory corretta
     entrypoint: ["k6", "run", "/scripts/grpc-test.js"]
+    depends_on:
+      - jaeger
 
 volumes:
   mongo_data:

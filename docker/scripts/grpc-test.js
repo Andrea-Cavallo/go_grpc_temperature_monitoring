@@ -2,7 +2,7 @@ import grpc from 'k6/net/grpc';
 import { check, sleep } from 'k6';
 
 const client = new grpc.Client();
-client.load(['../api/protos'], 'temperature.proto');
+client.load(['api/protos'], 'temperature.proto'); // Percorso relativo dentro il container
 
 export let options = {
     stages: [

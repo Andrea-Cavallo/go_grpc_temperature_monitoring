@@ -1,6 +1,6 @@
 # Super cool Go con GRPC
 
-<img src="GRPC.png"  height="800" width="600">
+<img src="./extra/img/GRPC.png"  height="800" width="600">
 
 
 ## Esecuzione del Progetto
@@ -30,6 +30,15 @@ $env:WEATHER_API_KEY="la-tua-api-key"
 ```
 
 Assicurati che la variabile d'ambiente `WEATHER_API_KEY` sia impostata correttamente prima di procedere.
+
+### 3. Build del docker-compose.yml
+
+- Assicurarsi di ditar su docker
+- docker/docker-compose.yml
+
+
+### 4. Opzionale
+
 
 ### 3. Eseguire il Server
 

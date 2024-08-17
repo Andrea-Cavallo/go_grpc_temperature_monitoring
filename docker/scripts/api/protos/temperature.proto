@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package temperature;
+
+option go_package = "go_with_grpc/pkg/temperature";
+
+
+// Messaggio per rappresentare una lettura della temperatura
+message TemperatureReading {
+  string location = 1;       // Nome della città o woeid
+  double temperature = 2;    // Temperatura in gradi Celsius
+  int64 timestamp = 3;       // Timestamp Unix della lettura
+}
+
+// Richiesta per ottenere la temperatura attuale in questo caso prende in ingresso solo la citta
+message GetCurrentTemperatureRequest {
+  string location = 1;
+}
+
+// Risposta per ottenere la temperatura attuale
+message GetCurrentTemperatureResponse {
+  TemperatureReading reading = 1; // Lettura della temperatura attuale
+}
+
+
+// Definizione del servizio gRPC
+service TemperatureService {
+  rpc GetCurrentTemperature(GetCurrentTemperatureRequest) returns (GetCurrentTemperatureResponse);
+}

@@ -14,8 +14,8 @@ import (
 func InitTelemetry() func(context.Context) error {
 	ctx := context.Background()
 
-	// Configura l'exporter OTLP per inviare i tracciamenti a Jaeger
-	exporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint("localhost:16685"), otlptracegrpc.WithInsecure())
+	// Configura l'exporter OTLP per inviare i tracciamenti a Jaeger sulla porta corretta
+	exporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint("localhost:4320"), otlptracegrpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Failed to create OTLP trace exporter: %v", err)
 	}

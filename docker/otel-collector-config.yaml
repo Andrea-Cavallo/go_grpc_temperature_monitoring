@@ -5,12 +5,13 @@ receivers:
         endpoint: "0.0.0.0:4317"
 
 exporters:
-  jaeger:
-    endpoint: "jaeger:16685"
-    insecure: true
+  otlp:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [jaeger]
+      exporters: [otlp]

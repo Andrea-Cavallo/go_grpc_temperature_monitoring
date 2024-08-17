@@ -2,6 +2,7 @@ package temperature_repo
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,10 +20,12 @@ func InsertTemperature(client *mongo.Client, reading TemperatureReading) error {
 	tracer := otel.Tracer("mongodb")
 	ctx, span := tracer.Start(context.Background(), "Insert-Temperature")
 	defer span.End()
-
+	log.Println("Inserting temperature on mongoDB:", reading)
 	collection := client.Database("temperatureDB").Collection("temperatures")
 	_, err := collection.InsertOne(ctx, reading)
 	if err != nil {
+		log.Println("Error during insertOne temperature on mongoDB:", reading)
+
 		span.RecordError(err)
 	}
 	return err
