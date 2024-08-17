@@ -1,0 +1,25 @@
+@startuml
+actor Client as client
+participant "gRPC Server" as server
+participant "MongoDB" as mongodb
+participant "Twilio API" as twilio
+participant "Weather API" as weather
+
+client -> server: Send Request
+server -> weather: Get Weather Data
+weather --> server: Return Weather Data
+
+loop Polling for Weather Conditions
+alt Weather Conditions Not Met
+server -> weather: Poll for Updated Weather Data
+weather --> server: Return Updated Weather Data
+else Weather Conditions Met
+server -> twilio: Send SMS
+twilio --> server: SMS Sent Confirmation
+break
+end
+end
+
+server -> mongodb: Store Operation Data (Optional)
+server --> client: Return Result
+@enduml

@@ -21,3 +21,5 @@
 # Go workspace file
 go.work
 
+*.idea
+go_with_grpc.iml

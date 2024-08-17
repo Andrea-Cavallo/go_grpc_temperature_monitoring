@@ -53,6 +53,11 @@ Il progetto utilizza Docker per facilitare l'impostazione dell'ambiente, inclusi
 ├── go.sum
 ```
 
+# Diagramma UML
+![Diagram](//www.plantuml.com/plantuml/png/TL9DJ_Cm3BxdLrWxlU-1Fy013JO9SHYREX1dR_L6H1g7n6L_dtoKQ96wI9NiF1z-MdSP1BsCWr5u5FQmCfgi00Ouvagv2EkZTXXl5-Tkju8z-H_oYyG9kMmv6xPdNZzbV4XrVsW9RnTjDCFZxYLp9BSjvODGFibNpgNqIfLGSFSmZRwFQMmF7NsF54ILomHdHSAVIU3FRes2AYE9T6NIaOpUjZnbc1tis1Xjpt1YN-4LsrwBPXiKn8D6PY1uPO4DYOBfp6HBvjdvtVKer3S1gl1suDiwCe7cGiq7AYkOlkL-iw-K0ZIJ8vnuabnFsW-OZAlWu0c_SXUjL7gkTZBz3T53s1Di7Vciph7XtzQb1it_AecQil3wmXs5qOXQHkTnCBy0)
+
+
+
 # Esecuzione del Progetto
 
 ## 1. Prerequisiti
@@ -180,7 +185,7 @@ Questo progetto è distribuito sotto la licenza Apache 2.0. Vedi il file LICENSE
 
 # Super cool Go with GRPC
 
-<img src="./extra/img/GRPC.png" height="800" width="600">
+<img src="./extra/img/GRPC.png" height="600" width="600">
 
 # Project Execution
 
