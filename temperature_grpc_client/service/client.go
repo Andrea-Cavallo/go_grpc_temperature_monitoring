@@ -20,7 +20,6 @@ type Client struct {
 // NewClient crea una nuova istanza del client gRPC per il servizio TemperatureService.
 // address è l'indirizzo del server gRPC (es. "localhost:50051").
 func NewClient(address string) (*Client, error) {
-	// Definisci un contesto con un timeout per la connessione gRPC
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

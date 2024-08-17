@@ -16,4 +16,4 @@ scrape_configs:
   # Scrape configuration for Node Exporter
   - job_name: 'node_exporter'
     static_configs:
-      - targets: ['node-exporter:9100']  # Nome del container e la porta su cui è esposto Node Exporter
+      - targets: ['node-exporter:9100']
