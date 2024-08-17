@@ -7,7 +7,7 @@ fornendo un esempio completo di un server gRPC che serve dati di temperatura e u
 il tutto con una gestione avanzata delle metriche, connessione a MongoDB per persistere i dati, funzionalità di allerta tramite Twilio.
 Il progetto utilizza Docker per facilitare l'impostazione dell'ambiente, inclusi la configurazione di MongoDB e altre dipendenze tipo jaeger.
 
-<img src="./extra/img/GRPC.png" height="800" width="600">
+<img src="./extra/img/GRPC.png" height="600" width="600">
 
 [Click here for the English version](#english-version)
 
