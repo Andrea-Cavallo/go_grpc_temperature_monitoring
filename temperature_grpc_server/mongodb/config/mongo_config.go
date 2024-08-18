@@ -2,7 +2,7 @@ package config
 
 import (
 	"context"
-	"log"
+	"github.com/sirupsen/logrus"
 	"sync"
 	"time"
 
@@ -49,7 +49,7 @@ func GetMongoClient() (*mongo.Client, error) {
 		// Verifica la connessione
 		clientInstanceErr = clientInstance.Ping(ctx, nil)
 		if clientInstanceErr == nil {
-			log.Println("Connected to MongoDB")
+			logrus.Println("Connected to MongoDB")
 		}
 	})
 

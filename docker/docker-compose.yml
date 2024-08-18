@@ -14,36 +14,28 @@ services:
       - mongo_data:/data/db
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.32
-    container_name: jaeger
-    ports:
-      - "5775:5775/udp"
-      - "6831:6831/udp"
-      - "6832:6832/udp"
-      - "5778:5778"
-      - "16686:16686"
-      - "14268:14268"
-      - "14250:14250"
-      - "4317:4317"
-      - "9411:9411"
-
   otel-collector:
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector-contrib:latest  # Assicurati di usare una versione che supporti Jaeger
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - "4320:4317"
-      - "55681:55681"
+      - "4318:4317" # OTLP gRPC receiver
+      - "9091:9090" # Prometheus metrics
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp" # UDP port for Jaeger agent
+      - "16686:16686" # Web UI
+      - "14268:14268" # HTTP port for spans
+      - "4317:4317" # gRPC for OTLP
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
-    ports:
-      - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
 
   grafana:
     image: grafana/grafana:latest
@@ -51,8 +43,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin  # Imposta la password di default a "admin"
-      - GF_SECURITY_ADMIN_USER=admin       # Impost
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
 
   loki:
     image: grafana/loki:2.7.1
@@ -60,7 +52,18 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - ./loki-config.yml:/etc/loki/loki-config.yml
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml
+
+  promtail:
+    image: grafana/promtail:2.7.1
+    container_name: promtail
+    volumes:
+      - /var/log:/var/log
+      - /var/lib/docker/containers:/var/lib/docker/containers
+      - ./promtail-config.yml:/etc/promtail/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
+    ports:
+      - "9080:9080"
 
   node-exporter:
     image: prom/node-exporter:latest
@@ -79,7 +82,5 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
 
-
 volumes:
   mongo_data:
-  clickhouse_data:

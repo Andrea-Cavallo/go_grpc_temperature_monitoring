@@ -1,0 +1,42 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+    timeout: 30s
+
+scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        target_label: container
+      - source_labels: [__meta_docker_container_image]
+        target_label: image
+      - source_labels: [__meta_docker_network_mode]
+        target_label: network_mode
+      - source_labels: [__meta_docker_container_id]
+        target_label: container_id
+      - source_labels: [__meta_docker_container_labels_com_docker_compose_service]
+        target_label: compose_service
+      - source_labels: [__meta_docker_container_labels_com_docker_compose_project]
+        target_label: compose_project
+      - source_labels: [__meta_docker_container_labels_com_docker_compose_config_hash]
+        target_label: compose_config_hash
+      - source_labels: [__meta_docker_container_labels_com_docker_compose_container_number]
+        target_label: compose_container_number
+      - source_labels: [__meta_docker_container_labels_com_docker_compose_oneoff]
+        target_label: compose_oneoff

@@ -3,6 +3,7 @@ package telemetry
 import (
 	"context"
 	"log"
+	"time"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
@@ -12,15 +13,14 @@ import (
 )
 
 func InitTelemetry() func(context.Context) error {
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-	// Configura l'exporter OTLP per inviare i tracciamenti a Jaeger sulla porta corretta
-	exporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint("localhost:4320"), otlptracegrpc.WithInsecure())
+	exporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithEndpoint("localhost:4317"), otlptracegrpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Failed to create OTLP trace exporter: %v", err)
 	}
 
-	// Configura il TracerProvider
 	tp := sdktrace.NewTracerProvider(
 		sdktrace.WithBatcher(exporter),
 		sdktrace.WithResource(resource.NewWithAttributes(

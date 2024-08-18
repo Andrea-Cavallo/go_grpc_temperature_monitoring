@@ -1,23 +1,10 @@
-/*
-Copyright 2024 Andrea Cavallo
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package main
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel"
+	"go_with_grpc/pkg/logger"
 	"go_with_grpc/pkg/telemetry"
 	"log"
 	"os"
@@ -30,12 +17,18 @@ import (
 
 const (
 	grpcServerAddress = "localhost:50051"
-	pollingInterval   = 25 * time.Second
+	initialDelay      = 0 * time.Second
+	pollingInterval   = 10 * time.Second
 	location          = "Rome"
 	outputFile        = "temp_graph.png"
 )
 
 func main() {
+	lokiHook, err := logger.NewLokiHook("http://localhost:3100/loki/api/v1/push", logrus.AllLevels)
+	if err != nil {
+		log.Fatalf("Failed to create Loki hook: %v", err)
+	}
+	logrus.AddHook(lokiHook)
 
 	// Inizializza OpenTelemetry
 	shutdown := telemetry.InitTelemetry()
@@ -53,22 +46,28 @@ func main() {
 		log.Fatalf("Errore nella creazione del client gRPC: %v", err)
 	}
 
+	logrus.Println("Polling temperatures...")
+
+	tracer := otel.Tracer("temperature-monitoring")
+	pollCtx, span := tracer.Start(ctx, "Temperature Polling")
+	client.GetCurrentTemperature(pollCtx, location)
+	span.End()
+
 	ticker := time.NewTicker(pollingInterval)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ctx.Done():
-			log.Println("Interruzione ricevuta, fermo il polling.")
-			log.Printf("Disegno il grafico delle temperature... in %s...\n", outputFile)
+			logrus.Println("Interruzione ricevuta, fermo il polling.")
+			logrus.Printf("Disegno il grafico delle temperature... in %s...\n", outputFile)
 			client.PlotTemperatureGraph(outputFile)
 			return
 		case <-ticker.C:
-			log.Println("Polling temperatures...")
+			logrus.Println("Polling temperatures...")
 
-			tracer := otel.Tracer("temperature-monitoring")
-			ctx, span := tracer.Start(ctx, "Temperature Polling")
-			client.GetCurrentTemperature(ctx, location)
+			pollCtx, span := tracer.Start(ctx, "Temperature Polling")
+			client.GetCurrentTemperature(pollCtx, location)
 			span.End()
 		}
 	}

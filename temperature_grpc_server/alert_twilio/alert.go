@@ -2,9 +2,9 @@ package alert_twilio
 
 import (
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"github.com/twilio/twilio-go"
 	openapi "github.com/twilio/twilio-go/rest/api/v2010"
-	"log"
 	"os"
 	"strconv"
 )
@@ -44,7 +44,7 @@ func sendTemperatureAlert(temperature float64) error {
 		return fmt.Errorf("failed to send alert: %v", err)
 	}
 
-	log.Printf("Alert sent successfully to %s", toPhone)
+	logrus.Println("Alert sent successfully to %s", toPhone)
 	return nil
 }
 
@@ -57,9 +57,9 @@ func CheckAndSendAlert(temp float64) {
 	}
 
 	if temp > temperatureThreshold {
-		log.Printf("Temperature alert triggered: %.2f°C", temp)
+		logrus.Println("Temperature alert triggered: %.2f°C", temp)
 		if err := sendTemperatureAlert(temp); err != nil {
-			log.Printf("Failed to send temperature alert: %v", err)
+			logrus.Println("Failed to send temperature alert: %v", err)
 		}
 	}
 }
