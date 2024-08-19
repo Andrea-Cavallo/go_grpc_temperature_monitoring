@@ -24,7 +24,7 @@ func InsertTemperature(client *mongo.Client, reading TemperatureReading) error {
 	collection := client.Database("temperatureDB").Collection("temperatures")
 	_, err := collection.InsertOne(ctx, reading)
 	if err != nil {
-		logrus.Errorf("Error during insertOne temperature on mongoDB:", reading)
+		logrus.Errorf("Error during insertOne temperature on mongoDB: %v", reading)
 
 		span.RecordError(err)
 	}

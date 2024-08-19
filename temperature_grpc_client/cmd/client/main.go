@@ -6,7 +6,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go_with_grpc/pkg/logger"
 	"go_with_grpc/pkg/telemetry"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +17,7 @@ import (
 const (
 	grpcServerAddress = "localhost:50051"
 	initialDelay      = 0 * time.Second
-	pollingInterval   = 10 * time.Second
+	pollingInterval   = 60 * time.Second
 	location          = "Rome"
 	outputFile        = "temp_graph.png"
 )
@@ -26,7 +25,7 @@ const (
 func main() {
 	lokiHook, err := logger.NewLokiHook("http://localhost:3100/loki/api/v1/push", logrus.AllLevels)
 	if err != nil {
-		log.Fatalf("Failed to create Loki hook: %v", err)
+		logrus.Errorf("Failed to create Loki hook: %v", err)
 	}
 	logrus.AddHook(lokiHook)
 
@@ -34,7 +33,7 @@ func main() {
 	shutdown := telemetry.InitTelemetry()
 	defer func() {
 		if err := shutdown(context.Background()); err != nil {
-			log.Fatalf("Failed to shut down OpenTelemetry: %v", err)
+			logrus.Errorf("Failed to shut down OpenTelemetry: %v", err)
 		}
 	}()
 
@@ -43,7 +42,7 @@ func main() {
 
 	client, err := service.NewClient(grpcServerAddress)
 	if err != nil {
-		log.Fatalf("Errore nella creazione del client gRPC: %v", err)
+		logrus.Errorf("Errore nella creazione del client gRPC: %v", err)
 	}
 
 	logrus.Println("Polling temperatures...")
@@ -60,7 +59,7 @@ func main() {
 		select {
 		case <-ctx.Done():
 			logrus.Println("Interruzione ricevuta, fermo il polling.")
-			logrus.Printf("Disegno il grafico delle temperature... in %s...\n", outputFile)
+			logrus.Printf("Disegno il grafico delle temperature... in %s", outputFile)
 			client.PlotTemperatureGraph(outputFile)
 			return
 		case <-ticker.C:

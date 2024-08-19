@@ -14,7 +14,7 @@ import (
 // Client è una struttura che rappresenta il client gRPC per il servizio TemperatureService.
 type Client struct {
 	service         temperature.TemperatureServiceClient
-	temperatureData []plot.TemperatureData // Memorizza i dati di temperatura per il plotting
+	temperatureData []plot.TemperatureData
 }
 
 // NewClient crea una nuova istanza del client gRPC per il servizio TemperatureService.
@@ -67,6 +67,6 @@ func (c *Client) PlotTemperatureGraph(outputFile string) {
 	if err := plot.PlotTemperatureGraph(c.temperatureData, outputFile); err != nil {
 		logrus.Errorf("Errore durante la generazione del grafico: %v", err)
 	} else {
-		logrus.Println("Grafico generato: %s\n", outputFile)
+		logrus.Printf("Grafico generato: %s", outputFile)
 	}
 }

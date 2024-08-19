@@ -44,7 +44,7 @@ func sendTemperatureAlert(temperature float64) error {
 		return fmt.Errorf("failed to send alert: %v", err)
 	}
 
-	logrus.Println("Alert sent successfully to %s", toPhone)
+	logrus.Printf("Alert sent successfully to %s", toPhone)
 	return nil
 }
 
@@ -57,9 +57,9 @@ func CheckAndSendAlert(temp float64) {
 	}
 
 	if temp > temperatureThreshold {
-		logrus.Println("Temperature alert triggered: %.2f°C", temp)
+		logrus.Printf("Temperature alert triggered: %.2f°C", temp)
 		if err := sendTemperatureAlert(temp); err != nil {
-			logrus.Println("Failed to send temperature alert: %v", err)
+			logrus.Errorf("Failed to send temperature alert: %v", err)
 		}
 	}
 }

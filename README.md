@@ -7,7 +7,7 @@ fornendo un esempio completo di un server gRPC che serve dati di temperatura e u
 il tutto con una gestione avanzata delle metriche, connessione a MongoDB per persistere i dati, funzionalità di allerta tramite Twilio.
 Il progetto utilizza Docker per facilitare l'impostazione dell'ambiente, inclusi la configurazione di MongoDB e altre dipendenze tipo jaeger.
 
-<img src="./extra/img/GRPC.png" height="600" width="600">
+<img src="./extra/img/GRPC.png" height="300" width="300">
 
 [Click here for the English version](#english-version)
 
@@ -147,7 +147,7 @@ Il client invierà una richiesta gRPC al server e riceverà una risposta con i d
 
 Ogni volta che arresti l'applicazione, in particolare il client, vedrai disegnato un grafico che mostrerà la variazione della temperatura.
 
-![Grafico della Temperatura](./temp_graph.png)
+![Grafico della Temperatura](extra/img/temp_graph.png)
 
 ## Per il dettaglio del client e del server
 
@@ -175,17 +175,16 @@ gRPC è circa sette volte più veloce di REST nel ricevere dati e circa dieci vo
 
 ## Autore
 
-Progetto sviluppato da [Andrea Cavallo].
+AndreaCavallo
 
-## Licenza
 
-Questo progetto è distribuito sotto la licenza Apache 2.0. Vedi il file LICENSE per ulteriori dettagli.
+-------------------------------------------------------------------------------------------------------------------
 
 # English Version
 
 # Super cool Go with GRPC
 
-<img src="./extra/img/GRPC.png" height="600" width="600">
+<img src="./extra/img/GRPC.png" height="300" width="300">
 
 # Project Execution
 
@@ -276,7 +275,7 @@ The client will send a gRPC request to the server and receive a response with th
 
 Whenever you shut down the application, especially the client, you will see a graph showing the temperature variation.
 
-![Temperature Graph](./temp_graph.png)
+![Temperature Graph](extra/img/temp_graph.png)
 
 ## Detailed Client and Server Documentation
 
@@ -303,9 +302,5 @@ gRPC is about seven times faster than REST in receiving data and about ten times
 
 
 ## Author
+Andrea Cavallo
 
-Project developed by [Andrea Cavallo].
-
-## License
-
-This project is licensed under the Apache 2.0 License. See the LICENSE file for more details.

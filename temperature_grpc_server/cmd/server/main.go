@@ -23,62 +23,56 @@ const (
 	tcp         = "tcp"
 )
 
-func main() {
+var log = logrus.WithFields(logrus.Fields{
+	"service": "temperature-grpc-server",
+	"env":     "development",
+})
 
+func main() {
 	lokiHook, err := logger.NewLokiHook("http://localhost:3100/loki/api/v1/push", logrus.AllLevels)
 	if err != nil {
-		logrus.Fatalf("Failed to create Loki hook: %v", err)
+		log.Errorf("Failed to create Loki hook: %v", err)
 	}
 	logrus.AddHook(lokiHook)
 	defer lokiHook.Close()
+
+	logrus.SetFormatter(&logrus.JSONFormatter{})
 	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetReportCaller(true)
 
-	// Usa Logrus normalmente
-	logrus.WithFields(logrus.Fields{
-		"service": "my-service",
-		"env":     "production",
-	}).Info("This is a log message sent to Loki")
-
-	// Crea un context con la gestione dei segnali per interrompere il server gRPC
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	// Avvia un server HTTP separato per il profiling pprof
 	go func() {
-		logrus.Println("Starting pprof server on :6060")
+		log.Info("Starting pprof server on :6060")
 		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
-			logrus.Fatalf("Failed to start pprof server: %v", err)
+			log.Errorf("Failed to start pprof server: %v", err)
 		}
 	}()
 
-	// Inizializza e configura OpenTelemetry
 	shutdownTelemetry := initializeTelemetry()
 	defer func() {
 		if err := shutdownTelemetry(context.Background()); err != nil {
-			logrus.Fatalf("Failed to shut down OpenTelemetry: %v", err)
+			log.Errorf("Failed to shut down OpenTelemetry: %v", err)
 		}
 	}()
 
-	// Avvia il server gRPC
-	if err := startGRPCServer(ctx, grpcAddress); err != nil {
-		logrus.Fatalf("Failed to start gRPC server: %v", err)
-	}
+	log.Info("Starting OpenTelemetry..")
 
-	// Attendo segnali di fumo per interrompere il server
+	if err := startGRPCServer(ctx, grpcAddress); err != nil {
+		log.Errorf("Failed to start gRPC server: %v", err)
+	}
+	log.Info("Starting GRPC server..")
+
 	<-ctx.Done()
-	logrus.Println("Server stopped.")
+	log.Info("Server stopped.")
 }
 
 func initializeTelemetry() func(context.Context) error {
 	return telemetry.InitTelemetry()
 }
 
-// startGRPCServer starts a gRPC server on the specified address.
-// It takes a context and the address as input parameters.
-// It listens on the specified address and handles incoming gRPC requests.
-// It registers the TemperatureServiceServer provided by service.NewServer.
-// It shuts down the gRPC server and closes the MongoDB client when the context is done.
-// It returns an error if any error occurs during the process.
+// startGRPCServer avvia un server gRPC sull'indirizzo specificato.
 func startGRPCServer(ctx context.Context, address string) error {
 	listener, err := net.Listen(tcp, address)
 	if err != nil {
@@ -90,15 +84,18 @@ func startGRPCServer(ctx context.Context, address string) error {
 
 	go func() {
 		<-ctx.Done()
-		logrus.Println("Shutting down gRPC server...")
+		log.Info("Shutting down gRPC server...")
 		grpcServer.GracefulStop()
-		logrus.Println("gRPC server stopped.")
+		log.Info("gRPC server was shutdown.")
 		config.CloseMongoClient()
-		logrus.Println("Closing MongoDB client... done. Goodbye! ^^")
+		log.Info("Closing MongoDB client... done. Goodbye! ^^")
 	}()
 
+	//Senza questa registrazione, il server gRPC non sarebbe in grado di gestire
+	//le chiamate RPC indirizzate al servizio TemperatureServiceServer.
 	temperature.RegisterTemperatureServiceServer(grpcServer, service.NewServer())
-	logrus.Println("gRPC server listening on %s\n", address)
+
+	log.Infof("gRPC server listening on %s", address)
 	if err := grpcServer.Serve(listener); err != nil {
 		return fmt.Errorf("failed to serve gRPC server: %w", err)
 	}

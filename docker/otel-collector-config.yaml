@@ -10,8 +10,8 @@ extensions:
   health_check: {}
 
 exporters:
-  jaeger:
-    endpoint: jaeger:14250
+  otlp:
+    endpoint: "http://jaeger:4317"  # Jaeger riceve dati da OTLP
     tls:
       insecure: true
   prometheus:
@@ -21,7 +21,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [jaeger]
+      exporters: [otlp]
     metrics:
       receivers: [otlp]
       exporters: [prometheus]
